@@ -13,11 +13,13 @@ The Kick windows desktop notification system.
 **How to Manage Ignores:**
 1. Click "Manage Ignores" from the right click notification area icon
 
-![Image of Context Menu from Notification / Tray Icon](https://user-images.githubusercontent.com/37368/221084256-c9317bbf-ec39-48ee-8d02-325997d0d200.png)
+![Image of Context Menu from Notification / Tray Icon](https://github.com/user-attachments/assets/0249d965-c08b-4a7b-8ccd-cc5048478c24)
+
 
 2, the following form will open where you can manage streamers that should be ignored
 
-![Image of Ignored Streamers UI](https://user-images.githubusercontent.com/37368/221084417-165afc63-1926-41f0-be36-e18e8c46318f.png)
+![Image of Manage Streamers UI](https://github.com/user-attachments/assets/104897f7-6f82-4897-9bcc-64902444401b)
+
 
 
 _Something to note:_
@@ -27,12 +29,13 @@ Streamers won't appear in the form until they have been seen
 **How to Exit:**
 To exit you will have a Notification Icon / Tray icon where you can quit the application.
 
-![Image of Context Menu from Notification / Tray Icon](https://user-images.githubusercontent.com/37368/221084256-c9317bbf-ec39-48ee-8d02-325997d0d200.png)
+![Image of Context Menu from Notification / Tray Icon](https://github.com/user-attachments/assets/0249d965-c08b-4a7b-8ccd-cc5048478c24)
 
 
 **What it looks like:**
 
-![Example of notification ](https://user-images.githubusercontent.com/37368/221086733-3a379a9b-6630-4edd-a7e5-e43815e47609.png)
+![Example of notification ](https://github.com/user-attachments/assets/792cac88-69ad-46a9-86cc-ed67b6774489)
+
 
 ## Development
 
@@ -66,14 +69,7 @@ Project Requests `CommunityToolkit-MainLatest` NuGET Package Source
 7. Click Ok
 
 ### Thanks
-A Huge Thanks to [CaspersGG](https://kick.com/CaspersGG) for coming up with this idea.
-Thanks to the following streamers for testing and promoting this application: 
-1. [Uprisen](https://kick.com/uprisen)
-2. [Anthogator](https://kick.com/anthogator)
-3. [Strife98](https://kick.com/strife98)
-4. [petfriendamy_](https://kick.com/petfriendamy_)
-5. [Roxas997](https://kick.com/roxas997)
-6. [Anthogator](https://kick.com/anthogator)
+This project is a port of [Twitchy](https://github.com/barkermn01/Twitchy) for Kick
 
 ## License
 
