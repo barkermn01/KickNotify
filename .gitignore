@@ -1,0 +1,18 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/KickDesktopNotifications/bin
+/KickDesktopNotifications/obj
+/.vs
+/KickDesktopNotifications/App.config
+/KickDesktopNotifications/KickDetails.cs
+/KickNotify-SetupFiles/KickNotifySetup.msi
+/KickNotify-SetupFiles/KickNotifySetup.exe
+/KickNotify-cache/part1/KickNotify1.cab
+/KickNotify-cache/part1/output-info.ini
+/KickNotify-cache/part1
+/KickNotify-cache/cacheIndex.txt
+/KickNotify-cache
+/KickDesktopNotifications/KickNotify.zip
+/SetupFiles
