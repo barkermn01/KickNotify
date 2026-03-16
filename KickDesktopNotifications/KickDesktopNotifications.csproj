@@ -52,7 +52,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="powershell -command &quot;if('$(ConfigurationName)' -eq 'ReleaseSign'){ cd $(TargetDir); ./sign.ps1}&quot;" />
+    <Exec Command="powershell -command &quot;if('$(ConfigurationName)' -eq 'ReleaseSign'){ cd '$(TargetDir)'; ./sign.ps1}&quot;" />
   </Target>
 
 </Project>

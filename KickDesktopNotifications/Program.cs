@@ -71,6 +71,7 @@ internal class Program
     private static NotifyIcon notifyIcon;
     private static ContextMenuStrip cms;
     private static ManageIgnores? manageIgnores;
+    private static ExtensionKeyWindow? extensionKeyWindow;
 
     public static void Ws_CodeRecived(object? sender, EventArgs e)
     {
@@ -126,6 +127,17 @@ internal class Program
         manageIgnores = null;
     }
 
+    protected static void ExtensionKey_Click(object? sender, System.EventArgs e)
+    {
+        if (extensionKeyWindow == null)
+        {
+            extensionKeyWindow = new ExtensionKeyWindow();
+            extensionKeyWindow.Closed += (s, args) => extensionKeyWindow = null;
+        }
+        extensionKeyWindow.Show();
+        extensionKeyWindow.Focus();
+    }
+
     protected static void Quit_Click(object? sender, System.EventArgs e)
     {
         notifyIcon.Visible = false;
@@ -174,6 +186,12 @@ internal class Program
             cms.Items.Add(reconnectItem);
             
             cms.Items.Add(new ToolStripSeparator());
+
+            var extensionKeyItem = new ToolStripMenuItem("Browser Extension", null, new EventHandler(ExtensionKey_Click));
+            extensionKeyItem.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular);
+            cms.Items.Add(extensionKeyItem);
+            
+            cms.Items.Add(new ToolStripSeparator());
             
             var quitItem = new ToolStripMenuItem("Quit", null, new EventHandler(Quit_Click), "Quit");
             quitItem.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular);
@@ -187,13 +205,16 @@ internal class Program
                 TriggerAuthentication();
             }
 
+            // Start the WebSocket server for browser extension communication
+            ExtensionServer.GetInstance().Start();
+
             var autoEvent = new AutoResetEvent(false);
             var timer = new System.Threading.Timer((Object? stateInfo) => {
                 if (DataStore.GetInstance().Store != null)
                 {
                     KickFetcher.GetInstance().GetLiveFollowingUsers();
                 }
-            }, autoEvent, 1000, 500);
+            }, autoEvent, 1000, 60000);
             
 
             Application.Run();
