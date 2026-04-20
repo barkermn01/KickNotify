@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Kick Notify"
-#define MyAppVersion "0.5"
+#define MyAppVersion "1.3"
 #define MyAppExeName "KickNotify.exe"
 
 #ifndef MyAppTargetFramework
@@ -10,7 +10,7 @@
 #endif
 
 #ifndef SourceDir
-  #define SourceDir "KickDesktopNotifications\bin\Release\net6.0-windows10.0.17763.0\"
+  #define SourceDir "KickDesktopNotifications\bin\x64\ReleaseSign\net6.0-windows10.0.17763.0\"
 #endif
 
 #define public Dependency_NoExampleSetup

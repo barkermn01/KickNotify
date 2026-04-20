@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,6 +20,9 @@ namespace KickDesktopNotifications.JsonStructure
 
         [JsonPropertyName("user_data")]
         public KickUser UserData { get; set; }
+
+        [JsonPropertyName("extension_key")]
+        public string ExtensionKey { get; set; }
 
         [JsonIgnore]
         public SteamersToIgnore SteamersToIgnore { 

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      width: 300px;
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f0f;
+      color: #fff;
+      padding: 16px;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #53fc18;
+    }
+    .header h1 { font-size: 16px; font-weight: 600; }
+    .status {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .status.connected { background: #1a3a1a; color: #53fc18; }
+    .status.disconnected { background: #3a1a1a; color: #ff4444; }
+    .btn {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 8px;
+      transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-primary { background: #53fc18; color: #0f0f0f; }
+    .btn-secondary { background: #2a2a2a; color: #fff; border: 1px solid #444; }
+    .btn-danger { background: #3a1a1a; color: #ff4444; border: 1px solid #ff4444; }
+    .result {
+      font-size: 12px;
+      padding: 8px;
+      border-radius: 4px;
+      margin-top: 8px;
+      display: none;
+    }
+    .result.success { display: block; background: #1a3a1a; color: #53fc18; }
+    .result.error { display: block; background: #3a1a1a; color: #ff4444; }
+    .channel-name {
+      font-size: 13px;
+      color: #53fc18;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .key-input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #53fc18;
+      border-radius: 4px;
+      background: #1a1a1a;
+      color: #53fc18;
+      font-family: Consolas, monospace;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+    .key-input::placeholder { color: #666; }
+    .section { display: none; }
+    .section.active { display: block; }
+    .hint {
+      font-size: 11px;
+      color: #999;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+    .channel-list {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .channel-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      color: #fff;
+      font-size: 13px;
+      transition: background 0.15s;
+    }
+    .channel-item:hover {
+      background: #1a1a1a;
+    }
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .live-dot.online { background: #53fc18; }
+    .live-dot.offline { background: #444; }
+    .channel-item .name { flex: 1; }
+    .channel-item .live-tag {
+      font-size: 10px;
+      color: #53fc18;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .no-channels {
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+      padding: 16px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>KickNotify</h1>
+  </div>
+
+  <!-- Key Setup Section -->
+  <div id="keySection" class="section">
+    <div id="status" class="status disconnected">Please enter your KickNotify integration key</div>
+    <p class="hint">Open KickNotify → right-click tray icon → Browser Extension to get your key.</p>
+    <input type="text" id="keyInput" class="key-input" placeholder="Paste integration key here..." />
+    <button id="btnSaveKey" class="btn btn-primary">Connect</button>
+    <div id="keyResult" class="result"></div>
+  </div>
+
+  <!-- Main Section (on Kick) -->
+  <div id="mainSection" class="section">
+    <div id="mainStatus" class="status connected">Connected to KickNotify</div>
+    <div id="channelInfo" class="channel-name"></div>
+    <button id="btnAdd" class="btn btn-primary" disabled>Add Current Channel</button>
+    <button id="btnImport" class="btn btn-secondary">Import Followed Channels</button>
+    <button id="btnDisconnect" class="btn btn-danger" style="margin-top: 8px;">Disconnect</button>
+    <div id="result" class="result"></div>
+  </div>
+
+  <!-- Channel List Section (not on Kick) -->
+  <div id="listSection" class="section">
+    <div class="status connected">Connected to KickNotify</div>
+    <div id="channelList" class="channel-list"></div>
+    <button id="btnDisconnect2" class="btn btn-danger" style="margin-top: 8px;">Disconnect</button>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿﻿﻿using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -36,7 +36,7 @@ namespace KickDesktopNotifications.Core
 
         public static KickFetcher instance { get; private set; }
 
-        List<KickChannel> currentlyLive = null;
+        public Dictionary<string, StreamerState> StreamerStates { get; } = new Dictionary<string, StreamerState>();
 
         public string guid { get; private set; }
 
@@ -352,67 +352,51 @@ namespace KickDesktopNotifications.Core
         {
             try
             {
-                // Get all manually added streamers from the store
                 var streamersToCheck = DataStore.GetInstance().Store.SteamersToIgnore.Streamers;
-                
+
                 if (streamersToCheck == null || streamersToCheck.Count == 0)
                 {
                     return;
                 }
 
-                List<KickChannel> liveChannels = new List<KickChannel>();
-
-                // Check each streamer to see if they're live
                 foreach (var streamer in streamersToCheck)
                 {
+                    if (!StreamerStates.ContainsKey(streamer.Name))
+                    {
+                        StreamerStates[streamer.Name] = new StreamerState { Slug = streamer.Name };
+                    }
+
+                    var state = StreamerStates[streamer.Name];
+
                     try
                     {
                         var channel = FetchChannelDataBySlug(streamer.Name);
-                        if (channel != null && channel.Stream != null && channel.Stream.IsLive)
+                        if (channel == null)
                         {
-                            liveChannels.Add(channel);
+                            // API call failed, don't touch state
+                            continue;
+                        }
+
+                        bool isLive = channel.Stream != null && channel.Stream.IsLive;
+                        bool shouldNotify = state.UpdateFromApiResult(isLive);
+
+                        if (shouldNotify && NotifyManager.ShouldNotify(channel.Slug))
+                        {
+                            Notification.GetInstance().sendNotification(
+                                channel.Slug,
+                                "https://kick.com/" + channel.Slug,
+                                channel.BannerPicture,
+                                channel.Stream.Thumbnail,
+                                channel.StreamTitle
+                            );
                         }
                     }
                     catch (Exception ex)
                     {
+                        // API call threw, don't touch state
                         Logger.GetInstance().WriteLine($"Error checking channel {streamer.Name}: {ex.Message}");
                     }
                 }
-
-                // Check for newly live channels and send notifications
-                if (currentlyLive != null)
-                {
-                    foreach (var channel in liveChannels)
-                    {
-                        bool found = false;
-
-                        foreach (var existingChannel in currentlyLive)
-                        {
-                            if (existingChannel.BroadcasterUserId == channel.BroadcasterUserId) 
-                            {
-                                found = true;
-                                break;
-                            }
-                        }
-
-                        if (!found)
-                        {
-                            // Only send notification if not ignored
-                            if (NotifyManager.ShouldNotify(channel.Slug))
-                            {
-                                Notification.GetInstance().sendNotification(
-                                    channel.Slug, 
-                                    "https://kick.com/" + channel.Slug, 
-                                    channel.BannerPicture, 
-                                    channel.Stream.Thumbnail, 
-                                    channel.StreamTitle
-                                );
-                            }
-                        }
-                    }
-                }
-
-                currentlyLive = liveChannels;
             }
             catch (Exception ex)
             {

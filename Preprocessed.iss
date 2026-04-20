@@ -574,7 +574,7 @@ end;
 SourceDir=.\
 AppId={{7774CEEE-6785-48B9-BA35-6B842F947A21}
 AppName=Kick Notify
-AppVersion=0.5
+AppVersion=1.3
 DefaultDirName={autopf}\Kick Notify
 DisableProgramGroupPage=yes
 LicenseFile=KickDesktopNotifications\Lisence.rtf
@@ -600,15 +600,15 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "autostarticon"; Description: "{cm:AutoStartProgram,Kick Notify}"; GroupDescription: "{cm:AdditionalIcons}";
 
 [Files]
-Source: "KickDesktopNotifications\bin\Release\net6.0-windows10.0.17763.0\KickNotify.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "KickDesktopNotifications\bin\Release\net6.0-windows10.0.17763.0\Microsoft.Toolkit.Uwp.Notifications.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "KickDesktopNotifications\bin\Release\net6.0-windows10.0.17763.0\Microsoft.Windows.SDK.NET.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "KickDesktopNotifications\bin\Release\net6.0-windows10.0.17763.0\KickNotify.deps.json"; DestDir: "{app}"; Flags: ignoreversion
-Source: "KickDesktopNotifications\bin\Release\net6.0-windows10.0.17763.0\KickNotify.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "KickDesktopNotifications\bin\Release\net6.0-windows10.0.17763.0\KickNotify.runtimeconfig.json"; DestDir: "{app}"; Flags: ignoreversion
-Source: "KickDesktopNotifications\bin\Release\net6.0-windows10.0.17763.0\WinRT.Runtime.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "KickDesktopNotifications\bin\Release\net6.0-windows10.0.17763.0\Assets\icon.ico"; DestDir: "{app}\Assets"; Flags: ignoreversion
-Source: "KickDesktopNotifications\bin\Release\net6.0-windows10.0.17763.0\Assets\kick.png"; DestDir: "{app}\Assets"; Flags: ignoreversion
+Source: "KickDesktopNotifications\bin\x64\ReleaseSign\net6.0-windows10.0.17763.0\KickNotify.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "KickDesktopNotifications\bin\x64\ReleaseSign\net6.0-windows10.0.17763.0\Microsoft.Toolkit.Uwp.Notifications.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "KickDesktopNotifications\bin\x64\ReleaseSign\net6.0-windows10.0.17763.0\Microsoft.Windows.SDK.NET.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "KickDesktopNotifications\bin\x64\ReleaseSign\net6.0-windows10.0.17763.0\KickNotify.deps.json"; DestDir: "{app}"; Flags: ignoreversion
+Source: "KickDesktopNotifications\bin\x64\ReleaseSign\net6.0-windows10.0.17763.0\KickNotify.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "KickDesktopNotifications\bin\x64\ReleaseSign\net6.0-windows10.0.17763.0\KickNotify.runtimeconfig.json"; DestDir: "{app}"; Flags: ignoreversion
+Source: "KickDesktopNotifications\bin\x64\ReleaseSign\net6.0-windows10.0.17763.0\WinRT.Runtime.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "KickDesktopNotifications\bin\x64\ReleaseSign\net6.0-windows10.0.17763.0\Assets\icon.ico"; DestDir: "{app}\Assets"; Flags: ignoreversion
+Source: "KickDesktopNotifications\bin\x64\ReleaseSign\net6.0-windows10.0.17763.0\Assets\kick.png"; DestDir: "{app}\Assets"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 Source: "netcorecheck.exe"; Flags: dontcopy noencryption
 Source: "netcorecheck_x64.exe"; Flags: dontcopy noencryption

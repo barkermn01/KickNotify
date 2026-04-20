@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "KickNotify",
+  "version": "1.0.0",
+  "description": "Add Kick streamers to KickNotify desktop notifications",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": ["*://*.kick.com/*"],
+  "icons": {
+    "128": "icon.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.kick.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+}
