@@ -162,6 +162,8 @@ namespace KickDesktopNotifications.Core
                         return HandleImportStreamers(msg);
                     case "list_streamers":
                         return HandleListStreamers();
+                    case "list_streamers_status":
+                        return HandleListStreamersStatus();
                     default:
                         return JsonSerializer.Serialize(new ExtensionResponse { Success = false, Error = $"Unknown action: {msg.Action}" });
                 }
@@ -217,6 +219,29 @@ namespace KickDesktopNotifications.Core
             var names = streamers?.Select(s => s.Name).ToList() ?? new List<string>();
             return JsonSerializer.Serialize(new ExtensionResponse { Success = true, Streamers = names });
         }
+
+        private string HandleListStreamersStatus()
+        {
+            var streamers = DataStore.GetInstance().Store.SteamersToIgnore?.Streamers;
+            if (streamers == null)
+            {
+                return JsonSerializer.Serialize(new ExtensionStatusResponse { Success = true, Channels = new List<ChannelStatus>() });
+            }
+
+            var states = KickFetcher.GetInstance().StreamerStates;
+            var channels = streamers
+                .Where(s => !s.IsIgnored)
+                .Select(s =>
+                {
+                    bool isLive = states.ContainsKey(s.Name) && states[s.Name].IsLive;
+                    return new ChannelStatus { Name = s.Name, IsLive = isLive };
+                })
+                .OrderByDescending(c => c.IsLive)
+                .ThenBy(c => c.Name)
+                .ToList();
+
+            return JsonSerializer.Serialize(new ExtensionStatusResponse { Success = true, Channels = channels });
+        }
     }
 
     internal class ExtensionMessage
@@ -244,5 +269,23 @@ namespace KickDesktopNotifications.Core
 
         [System.Text.Json.Serialization.JsonPropertyName("streamers")]
         public List<string> Streamers { get; set; }
+    }
+
+    internal class ChannelStatus
+    {
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
+        public string Name { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("is_live")]
+        public bool IsLive { get; set; }
+    }
+
+    internal class ExtensionStatusResponse
+    {
+        [System.Text.Json.Serialization.JsonPropertyName("success")]
+        public bool Success { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("channels")]
+        public List<ChannelStatus> Channels { get; set; }
     }
 }

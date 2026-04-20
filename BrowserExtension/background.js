@@ -64,7 +64,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     return true;
   }
 
-  if (msg.type === "add_streamer" || msg.type === "import_streamers" || msg.type === "list_streamers") {
+  if (msg.type === "add_streamer" || msg.type === "import_streamers" || msg.type === "list_streamers" || msg.type === "list_streamers_status") {
     connectAndSend(msg.payload)
       .then((res) => sendResponse(res))
       .catch((err) => sendResponse({ success: false, error: err.message }));

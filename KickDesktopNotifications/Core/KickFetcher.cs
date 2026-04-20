@@ -36,7 +36,7 @@ namespace KickDesktopNotifications.Core
 
         public static KickFetcher instance { get; private set; }
 
-        Dictionary<string, StreamerState> streamerStates = new Dictionary<string, StreamerState>();
+        public Dictionary<string, StreamerState> StreamerStates { get; } = new Dictionary<string, StreamerState>();
 
         public string guid { get; private set; }
 
@@ -361,12 +361,12 @@ namespace KickDesktopNotifications.Core
 
                 foreach (var streamer in streamersToCheck)
                 {
-                    if (!streamerStates.ContainsKey(streamer.Name))
+                    if (!StreamerStates.ContainsKey(streamer.Name))
                     {
-                        streamerStates[streamer.Name] = new StreamerState { Slug = streamer.Name };
+                        StreamerStates[streamer.Name] = new StreamerState { Slug = streamer.Name };
                     }
 
-                    var state = streamerStates[streamer.Name];
+                    var state = StreamerStates[streamer.Name];
 
                     try
                     {

@@ -1,11 +1,14 @@
 const keySection = document.getElementById("keySection");
 const mainSection = document.getElementById("mainSection");
+const listSection = document.getElementById("listSection");
 const statusEl = document.getElementById("status");
 const mainStatusEl = document.getElementById("mainStatus");
 const channelEl = document.getElementById("channelInfo");
+const channelListEl = document.getElementById("channelList");
 const btnAdd = document.getElementById("btnAdd");
 const btnImport = document.getElementById("btnImport");
 const btnDisconnect = document.getElementById("btnDisconnect");
+const btnDisconnect2 = document.getElementById("btnDisconnect2");
 const btnSaveKey = document.getElementById("btnSaveKey");
 const keyInput = document.getElementById("keyInput");
 const resultEl = document.getElementById("result");
@@ -18,6 +21,7 @@ let activeTabId = null;
 function showSection(section) {
   keySection.classList.remove("active");
   mainSection.classList.remove("active");
+  listSection.classList.remove("active");
   section.classList.add("active");
 }
 
@@ -48,22 +52,67 @@ function tryConnect(callback) {
   );
 }
 
-function loadCurrentChannel() {
+function disconnect() {
+  chrome.storage.local.remove("kicknotify_key", () => {
+    showSection(keySection);
+    keyInput.value = "";
+    statusEl.textContent = "Please enter your KickNotify integration key";
+    statusEl.className = "status disconnected";
+    clearResult(keyResultEl);
+  });
+}
+
+function loadChannelList() {
+  chrome.runtime.sendMessage(
+    { type: "list_streamers_status", payload: { action: "list_streamers_status" } },
+    (res) => {
+      if (chrome.runtime.lastError || !res || !res.success) {
+        channelListEl.innerHTML = '<div class="no-channels">Could not load channels</div>';
+        return;
+      }
+
+      const channels = res.channels;
+      if (!channels || channels.length === 0) {
+        channelListEl.innerHTML = '<div class="no-channels">No channels added yet</div>';
+        return;
+      }
+
+      channelListEl.innerHTML = "";
+      for (const ch of channels) {
+        const a = document.createElement("a");
+        a.className = "channel-item";
+        a.href = "https://kick.com/" + ch.name;
+        a.target = "_blank";
+        a.innerHTML =
+          '<span class="live-dot ' + (ch.is_live ? "online" : "offline") + '"></span>' +
+          '<span class="name">' + ch.name + '</span>' +
+          (ch.is_live ? '<span class="live-tag">LIVE</span>' : '');
+        channelListEl.appendChild(a);
+      }
+    }
+  );
+}
+
+function showConnected() {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    if (!tabs[0]) return;
+    if (!tabs[0]) {
+      showSection(listSection);
+      loadChannelList();
+      return;
+    }
     activeTabId = tabs[0].id;
 
     try {
       const url = new URL(tabs[0].url);
       if (!url.hostname.includes("kick.com")) {
         onKick = false;
-        channelEl.textContent = "Not on Kick";
-        btnAdd.disabled = true;
+        showSection(listSection);
+        loadChannelList();
         return;
       }
       onKick = true;
+      showSection(mainSection);
 
-      // Extract slug from URL directly
       const match = url.pathname.match(/^\/([a-zA-Z0-9_-]+)\/?$/);
       if (match) {
         currentSlug = match[1];
@@ -75,13 +124,13 @@ function loadCurrentChannel() {
       }
     } catch {
       onKick = false;
-      channelEl.textContent = "Not on Kick";
-      btnAdd.disabled = true;
+      showSection(listSection);
+      loadChannelList();
     }
   });
 }
 
-// On popup open, check if we have a key and can connect
+// On popup open
 chrome.runtime.sendMessage({ type: "get_key" }, (res) => {
   if (!res || !res.key) {
     showSection(keySection);
@@ -90,8 +139,7 @@ chrome.runtime.sendMessage({ type: "get_key" }, (res) => {
 
   tryConnect((ok, reason) => {
     if (ok) {
-      showSection(mainSection);
-      loadCurrentChannel();
+      showConnected();
     } else if (reason === "invalid_key" || reason === "no_key") {
       showSection(keySection);
       statusEl.textContent = "Invalid key - please re-enter your integration key";
@@ -102,7 +150,7 @@ chrome.runtime.sendMessage({ type: "get_key" }, (res) => {
   });
 });
 
-// Save key and test connection
+// Save key
 btnSaveKey.addEventListener("click", () => {
   const key = keyInput.value.trim();
   if (!key) {
@@ -120,8 +168,7 @@ btnSaveKey.addEventListener("click", () => {
       btnSaveKey.textContent = "Connect";
 
       if (ok) {
-        showSection(mainSection);
-        loadCurrentChannel();
+        showConnected();
       } else if (reason === "invalid_key") {
         showResult(keyResultEl, false, "Invalid key - check the key in KickNotify and try again");
       } else {
@@ -131,16 +178,8 @@ btnSaveKey.addEventListener("click", () => {
   });
 });
 
-// Disconnect
-btnDisconnect.addEventListener("click", () => {
-  chrome.storage.local.remove("kicknotify_key", () => {
-    showSection(keySection);
-    keyInput.value = "";
-    statusEl.textContent = "Please enter your KickNotify integration key";
-    statusEl.className = "status disconnected";
-    clearResult(keyResultEl);
-  });
-});
+btnDisconnect.addEventListener("click", disconnect);
+btnDisconnect2.addEventListener("click", disconnect);
 
 // Add current channel
 btnAdd.addEventListener("click", () => {
@@ -176,7 +215,7 @@ btnAdd.addEventListener("click", () => {
   );
 });
 
-// Import followed channels using chrome.scripting.executeScript
+// Import followed channels
 btnImport.addEventListener("click", () => {
   if (!onKick) {
     showResult(resultEl, false, "Can't be used - not on Kick");
@@ -195,84 +234,36 @@ btnImport.addEventListener("click", () => {
     {
       target: { tabId: activeTabId },
       func: () => {
-        const debug = {};
         const channels = [];
-
         const sidebar = document.querySelector("#sidebar-wrapper");
-        debug.hasSidebar = !!sidebar;
-        if (!sidebar) {
-          console.log("[KickNotify Debug]", debug);
-          return { channels, debug };
-        }
+        if (!sidebar) return channels;
 
-        debug.sidebarChildCount = sidebar.children.length;
-        debug.sidebarHTML = sidebar.innerHTML.substring(0, 500);
-
-        // Find the "Following" section header (skip the nav link)
         let followingSection = null;
-        const textNodes = [];
-        const walker = document.createTreeWalker(
-          sidebar,
-          NodeFilter.SHOW_TEXT,
-          null
-        );
+        const walker = document.createTreeWalker(sidebar, NodeFilter.SHOW_TEXT, null);
         while (walker.nextNode()) {
-          const txt = walker.currentNode.textContent.trim();
-          if (txt.length > 0 && txt.length < 50) {
-            textNodes.push(txt);
-          }
-          if (txt === "Following") {
+          if (walker.currentNode.textContent.trim() === "Following") {
             const parent = walker.currentNode.parentElement;
-            // Skip if inside a nav <a> tag (Home/Browse/Following links)
             if (parent && parent.closest("a")) continue;
-            debug.followingParentTag = parent ? parent.tagName : null;
-            debug.followingParentClasses = parent ? parent.className : null;
             followingSection = parent ? parent.closest("section") : null;
-            if (!followingSection && parent) {
-              followingSection = parent.parentElement;
-            }
+            if (!followingSection && parent) followingSection = parent.parentElement;
             break;
           }
         }
-        debug.textNodesFound = textNodes;
-        debug.hasFollowingSection = !!followingSection;
 
-        if (!followingSection) {
-          console.log("[KickNotify Debug]", debug);
-          return { channels, debug };
-        }
-
-        debug.followingSectionTag = followingSection.tagName;
-        debug.followingSectionChildCount = followingSection.children.length;
+        if (!followingSection) return channels;
 
         const links = followingSection.querySelectorAll('a[href^="/"]');
-        debug.linkCount = links.length;
-        const linkDetails = [];
         for (const link of links) {
           const href = link.getAttribute("href");
-          linkDetails.push(href);
           if (!href) continue;
           const slug = href.replace(/^\/+/, "").split("/")[0].toLowerCase();
-          if (slug && slug.length > 1) {
-            channels.push(slug);
-          }
+          if (slug && slug.length > 1) channels.push(slug);
         }
-        debug.linkHrefs = linkDetails;
-
-        console.log("[KickNotify Debug]", debug);
-        return { channels, debug };
+        return channels;
       },
     },
     (results) => {
-      console.log("[KickNotify] executeScript raw results:", results);
-      console.log("[KickNotify] lastError:", chrome.runtime.lastError);
-
-      const data = results && results[0] && results[0].result;
-      const channels = data && data.channels;
-      const debug = data && data.debug;
-
-      console.log("[KickNotify] channels:", channels);
-      console.log("[KickNotify] debug:", debug);
+      const channels = results && results[0] && results[0].result;
 
       if (!channels || channels.length === 0) {
         btnImport.disabled = false;
